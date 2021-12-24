@@ -1,128 +1,22 @@
-<p align="center">
-  <a href="https://react-static-tweets.vercel.app/1352687755621351425">
-    <img alt="React Static Tweets" src="https://raw.githubusercontent.com/transitive-bullshit/react-static-tweets/master/example/demo.jpg" width="550">
-  </a>
-</p>
+# Changes different from the parent fork:
 
-# React Static Tweets
+Parent package doesn't give us the way for us to change its default components like [mdx [originaly did in v1] does](https://mdxjs.com/docs/using-mdx/#components). Since stencil has to use a wrapper on top of `next/image` Image component to prefix the image urls, we had to form the parent package, make necessary changes to be able to pass custom loader to the `next/image` that `react-static-tweets` original package uses inside, at least for the avatar image for the tweet.
 
-> Extremely fast static renderer for tweets.
+There were a lot of issues that I wasn't able to figure out but eventually worked around. Following are the changes that were made to make a build happen in this mono repo which didn't cause a module related issue in stencil (at this point of writing, using Next.js v12).
 
-[![NPM](https://img.shields.io/npm/v/react-static-tweets.svg)](https://www.npmjs.com/package/react-static-tweets) [![Build Status](https://github.com/transitive-bullshit/react-static-tweets/actions/workflows/build.yml/badge.svg)](https://github.com/transitive-bullshit/react-static-tweets/actions/workflows/build.yml) [![Prettier Code Formatting](https://img.shields.io/badge/code_style-prettier-brightgreen.svg)](https://prettier.io)
+Some of the issues that I faced while 'intuitively' trying to build as I thought authors of the package would.
 
-## Why?
+1. https://github.com/transitive-bullshit/react-static-tweets/issues/35
 
-Twitter's embedding SDK is horribly slow and inefficient. For embedding tweets on your site (including SSR), this solution is 10-100x faster! 🔥
+Since the default tsc compiler based build step was causing issues like the above, which I couldn't figure out the reason of,
 
-This project takes Vercel's work on [static tweet rendering](https://static-tweet.vercel.app) and packages it up into two easy-to-use NPM packages.
+1. I copy pasted the changes made in [this open PR](https://github.com/transitive-bullshit/react-static-tweets/pull/34). This basically automatically and very minimally transpiled the code into .cjs ( common js ) and .js ( es module imports ) versions.
+2. removed the `"type": "module"` property in both of the `react-static-tweets-indmoney-web` and `static-tweets-indmoney-web`'s `package.json` files and kept the `main` file in package.json as the `.cjs` files for both packages, because there was [a very weird error](https://github.com/transitive-bullshit/react-static-tweets/issues/23#issuecomment-818619457) coming from `swr` package, if we tried to use the es modules `.js` version of the files. If this error wasn't coming we would have been able to use the es modules version of `.js` files since Next.js v12 supports it. But we had to make do with common js (`.cjs`) files to be the default imports.
 
-This project is being used in production by [super.so](https://s.super.so/x).
+I also couldn't figure out why `lerna publish` was publishing the whole repository instead of the individual packages. So until that is figured out. Here's how to build and update the packages if you need to:
 
-## Features
-
-- ⚡ **Fast** - 10-100x faster than using Twitter's iframe widget.
-- 🔥 **Solid** - Used in production by [super.so](https://s.super.so/x), [addpotion.so](https://addpotion.so), [Twitter Search](https://twitter-search.vercel.app) and [react-notion-x](https://transitivebullsh.it/nextjs-notion-starter-kit).
-- 🚀 **Simple** - TypeScript + React.
-
-## Install
-
-```bash
-npm install react-static-tweets static-tweets date-fns
-# or
-yarn add react-static-tweets static-tweets date-fns
-```
-
-## Usage
-
-The easiest way to get started is to render tweets client-side (which will fetch the tweet data on-the-fly).
-
-```tsx
-import React from 'react'
-import { Tweet } from 'react-static-tweets'
-
-export default Example({ tweetId }) => (
-  <Tweet id={tweetId} />
-)
-```
-
-For more optimized SSR usage, you'll want to pre-fetch the tweet AST data server-side:
-
-```tsx
-import React from 'react'
-import { fetchTweetAst } from 'static-tweets'
-import { Tweet } from 'react-static-tweets'
-
-const tweetId = '1358199505280262150'
-
-export const getStaticProps = async () => {
-  try {
-    const tweetAst = await fetchTweetAst(tweetId)
-
-    return {
-      props: {
-        tweetId,
-        tweetAst
-      },
-      revalidate: 10
-    }
-  } catch (err) {
-    console.error('error fetching tweet info', err)
-
-    throw err
-  }
-}
-
-export default function Example({ tweetId, tweetAst }) {
-  return <Tweet id={tweetId} ast={tweetAst} />
-}
-```
-
-Add `pbs.twimg.com` to your `next.config.js` since we use `next/image` to load images.
-
-```js
-module.exports = {
-  images: {
-    domains: ['pbs.twimg.com']
-  }
-}
-```
-
-## Styles
-
-You'll need to import some CSS styles as well. If you're using Next.js, we recommend you put these in `pages/_app`:
-
-```ts
-import 'react-static-tweets/styles.css'
-```
-
-## Next.js Example
-
-Here's a full [Next.js example project](https://github.com/transitive-bullshit/react-static-tweets/tree/master/example) with the most important code in [`pages/[tweetId]`.tsx](https://github.com/transitive-bullshit/react-static-tweets/blob/master/example/pages/%5BtweetId%5D.tsx).
-
-You can check out an [example hosted live on Vercel](https://react-static-tweets.vercel.app). A more in-depth example via [twitter search](https://twitter-search.vercel.app) which provides an Algolia search UI on top of my personal twitter history ([@transitive_bs](https://twitter.com/transitive_bs)).
-
-For an example of more advanced usage and customization, check out [nextjs-notion-starter-kit](https://github.com/transitive-bullshit/nextjs-notion-starter-kit/blob/main/components/NotionPage.tsx#L164).
-
-## Packages
-
-| Package                                               | NPM                                                                                                               | Docs                                   | Environment   | Description                     |
-| ----------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- | -------------------------------------- | ------------- | ------------------------------- |
-| [react-static-tweets](./packages/react-static-tweets) | [![NPM](https://img.shields.io/npm/v/react-static-tweets.svg)](https://www.npmjs.com/package/react-static-tweets) | [docs](./packages/react-static-tweets) | Browser + SSR | Fast React renderer for Tweets. |
-| [static-tweets](./packages/static-tweets)             | [![NPM](https://img.shields.io/npm/v/static-tweets.svg)](https://www.npmjs.com/package/static-tweets)             | [docs](./docs/static-tweets.md)        | Node.js       | Fetches tweet ASTs.             |
-
-## Credit
-
-My main contribution is packaging the Vercel team's excellent work into two isolated packages: `static-tweets` for server-side fetching of tweet ASTs and `react-static-tweets` for client-side rendering as well as SSR.
-
-- Inspired by this [demo](https://static-tweet.vercel.app/) from the Vercel team
-- And the underlying [repo](https://github.com/lfades/static-tweet) by [Luis Alvarez](https://github.com/lfades)
-- Most of the core code is adapted from [Guillermo Rauch's blog](https://github.com/rauchg/blog/blob/master/pages/2020/2019-in-review.js)
-- Converted the JS codebase to TypeScript
-- Removed `styled-jsx` because using a flat CSS file (with a `.static-tweet` class prefix) makes bundling for NPM easier
-- Fixed some minor formatting bugs
-
-## License
-
-MIT © [Travis Fischer](https://transitivebullsh.it)
-
-Support my OSS work by <a href="https://twitter.com/transitive_bs">following me on twitter <img src="https://storage.googleapis.com/saasify-assets/twitter-logo.svg" alt="twitter" height="24px" align="center"></a>
+1. clone the repo
+2. run `yarn`
+3. make your changes in any of the packages.
+4. run `yarn build` FROM THE ROOT. This will initiate running `build` commands specified in individual packages' `package.json` files. This happens automatically through lerna.
+5. Go to each of the packages ( whichever you have updated and you want to publish ) by doing `cd ./packages/<package_name>` and run `npm publish`. Before you do make sure you are logged into `indmoney` npm account through npm cli by running. `npm login`. Credentials are shared in this confluence document.
