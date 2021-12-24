@@ -1,15 +1,20 @@
 {
-  "name": "static-tweets",
-  "version": "0.5.5",
+  "name": "static-tweets-indmoney-web",
+  "version": "0.0.8",
   "description": "Utilities for fetching and manipulating tweet ASTs.",
   "repository": "transitive-bullshit/react-static-tweets",
   "author": "Travis Fischer <travis@transitivebullsh.it>",
   "license": "MIT",
-  "main": "build/cjs/index.js",
-  "module": "build/esm/index.js",
-  "typings": "build/esm/index.d.ts",
+  "source": "./src/index.ts",
+  "main": "./build/index.cjs",
+  "module": "./build/index.module.js",
+  "typings": "./build/index.d.ts",
   "engines": {
     "node": ">=12"
+  },
+  "scripts": {
+    "build": "microbundle -f cjs,esm --target node --no-compress",
+    "watch": "microbundle -f cjs,esm --target node --watch"
   },
   "dependencies": {
     "@mapbox/rehype-prism": "^0.5.0",
@@ -23,10 +28,13 @@
     "rehype-sanitize": "^4.0.0",
     "remark-parse": "^9.0.0",
     "remark-rehype": "^8.0.0",
-    "unified": "^9.0.0",
-    "unist-util-visit": "^3.0.0"
+    "unified": "^9.0.0"
   },
   "devDependencies": {
-    "ava": "^3.13.0"
+    "ava": "^3.13.0",
+    "mdast-util-to-string": "^3.0.0",
+    "microbundle": "^0.13.1",
+    "hast-util-sanitize": "^4.0.0",
+    "unist-util-visit": "^3.0.0"
   }
 }

@@ -1,19 +1,23 @@
 {
-  "name": "react-static-tweets",
-  "version": "0.5.4",
+  "name": "react-static-tweets-indmoney-web",
+  "version": "0.0.11",
   "description": "Extremely fast static renderer for tweets.",
   "repository": "transitive-bullshit/react-static-tweets",
   "author": "Travis Fischer <travis@transitivebullsh.it>",
   "license": "MIT",
-  "main": "build/cjs/index.js",
-  "module": "build/esm/index.js",
-  "typings": "build/esm/index.d.ts",
+  "main": "build/index.cjs",
+  "module": "build/index.module.js",
+  "typings": "build/index.d.ts",
   "engines": {
     "node": ">=12"
   },
+  "scripts": {
+    "build": "microbundle -f cjs,esm --no-compress --tsconfig ./tsconfig.json",
+    "watch": "microbundle -f cjs,esm --watch"
+  },
   "dependencies": {
     "classnames": "^2.2.6",
-    "swr": "^1.0.0-beta.5"
+    "swr": "^1.1.1"
   },
   "devDependencies": {
     "@types/react": "^17.0.3",
