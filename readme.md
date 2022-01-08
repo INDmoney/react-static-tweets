@@ -1,6 +1,6 @@
 # Changes different from the parent fork:
 
-Parent package doesn't give us the way for us to change its default components like [mdx [originaly did in v1] does](https://mdxjs.com/docs/using-mdx/#components). Since stencil has to use a wrapper on top of `next/image` Image component to prefix the image urls, we had to form the parent package, make necessary changes to be able to pass custom loader to the `next/image` that `react-static-tweets` original package uses inside, at least for the avatar image for the tweet.
+Parent package doesn't give us the way for us to change its default components like [mdx [originaly did in v1] does](https://mdxjs.com/docs/using-mdx/#components). Since stencil has to use a wrapper on top of `next/image` Image component to prefix the image urls, we had to fork the parent package, make necessary changes to be able to pass custom loader to the `next/image` that `react-static-tweets` original package uses inside, at least for the avatar image for the tweet.
 
 There were a lot of issues that I wasn't able to figure out but eventually worked around. Following are the changes that were made to make a build happen in this mono repo which didn't cause a module related issue in stencil (at this point of writing, using Next.js v12).
 
